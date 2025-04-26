@@ -25,4 +25,7 @@ class NeuralNetwork(nn.Module):
             nn.Linear(512, 10)
         )
 
-  
+def forward(self, x):
+        x = self.flatten(x)
+        logits = self.linear_relu_stack(x)
+        return logits
