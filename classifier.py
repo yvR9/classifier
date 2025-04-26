@@ -29,3 +29,12 @@ def forward(self, x):
         x = self.flatten(x)
         logits = self.linear_relu_stack(x)
         return logits
+
+# Define training function used to train model
+def train(dataloader, model, loss_fn, optimiser):
+    size = len(dataloader.dataset)
+    model.train()
+    for batch, (X, y) in enumerate(dataloader):
+        X, y = X.to(device), y.to(device)
+        
+       
