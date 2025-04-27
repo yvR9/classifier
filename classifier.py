@@ -31,24 +31,40 @@ def forward(self, x):
         return logits
 
 # Define training function used to train model
-def train(dataloader, model, loss_fn, optimiser):
+def train(dataloader, model, loss_fn, optimizer, scheduler=None):
     size = len(dataloader.dataset)
     model.train()
+    total_loss = 0
+    correct = 0
+
     for batch, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
-      
-        # Compute prediction error
+
+        # Forward pass
         pred = model(X)
         loss = loss_fn(pred, y)
-        
-        # Backpropagation
-        optimiser.zero_grad()
+
+        # Backward pass and optimization
+        optimizer.zero_grad()
         loss.backward()
-        optimiser.step()
-        
+        optimizer.step()
+
+        # Update learning rate if scheduler is provided
+        if scheduler:
+            scheduler.step()
+
+        # Accumulate loss and correct predictions
+        total_loss += loss.item()
+        correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+
         if batch % 100 == 0:
-            loss, current = loss.item(), (batch + 1) * len(X)
-            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+            current = (batch + 1) * len(X)
+            print(f"loss: {loss.item():>7f}  [{current:>5d}/{size:>5d}]")
+
+    avg_loss = total_loss / len(dataloader)
+    accuracy = correct / size
+    print(f"Train Error: \n Accuracy: {(100*accuracy):>0.1f}%, Avg loss: {avg_loss:>8f} \n")
+
 
 # Define testing function used to test model
 def test(dataloader, model, loss_fn):
