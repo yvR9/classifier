@@ -66,3 +66,33 @@ def test(dataloader, model, loss_fn):
     correct /= size
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
     return correct
+
+# Function to predict the class of a single image
+def predict_image(model, image_path, device="cpu"):
+    # Class labels for FashionMNIST
+    class_labels = ['T-shirt', 'Trouser', 'Pullover', 'Dress', 'Coat',
+                   'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
+    
+    try:
+        # Load and preprocess the image
+        img = io.read_image(image_path, mode=ImageReadMode.GRAY)
+        img = img.float() / 255.0  # Normalize to [0, 1]
+        
+        # Check image dimensions
+        if img.shape[1] != 28 or img.shape[2] != 28:
+            img = transforms.Resize((28, 28))(img)
+        
+        # Add batch dimension
+        img = img.unsqueeze(0).to(device)
+        
+        # Make prediction
+        model.eval()
+        with torch.no_grad():
+            output = model(img)
+            _, predicted = torch.max(output, 1)
+            predicted_class = class_labels[predicted.item()]
+        
+        return predicted_class
+    
+    except Exception as e:
+        return f"Error processing image: {str(e)}"
