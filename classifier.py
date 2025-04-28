@@ -30,7 +30,7 @@ class NeuralNetwork(nn.Module):
         return logits
 
 # Define training function used to train model
-def train_loop(dataloader, model, loss_fn, optimizer):
+def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
     batch_size = dataloader.batch_size
     # Set the model to training mode - important for batch normalization and dropout layers
@@ -82,7 +82,7 @@ def predict_image(model, image_path, device="cpu"):
     
     try:
         # Load and preprocess the image
-        
+        img = read_image(image_path, mode=ImageReadMode.GRAY)
         img = img.float() / 255.0  # Normalize to [0, 1]
         
         # Check image dimensions
@@ -125,15 +125,16 @@ def main():
     
     # Define loss function and optimiser
     loss_fn = nn.CrossEntropyLoss()
-    
+    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
     
     # Training loop
-    epochs = 25
+    epochs = 50
     best_accuracy = 0
     
     for t in range(epochs):
         print(f"Epoch {t+1}\n-------------------------------")
-        
+        train_loop(train_dataloader, model, loss_fn, optimizer)
+        accuracy = test_loop(test_dataloader, model, loss_fn)
         
         # Save best model
         if accuracy > best_accuracy:
@@ -149,7 +150,7 @@ def main():
     print("Loaded best model for evaluation")
     
     while True:
-        
+        file_path = input("Please enter a filepath (or 'exit' to quit):\n> ")
         if file_path.lower() == "exit":
             print("Exiting...")
             break
