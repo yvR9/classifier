@@ -30,7 +30,7 @@ class NeuralNetwork(nn.Module):
         return logits
 
 # Define training function used to train model
-def train(dataloader, model, loss_fn, optimizer):
+def train_loop(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
     batch_size = dataloader.batch_size
     # Set the model to training mode - important for batch normalization and dropout layers
@@ -45,7 +45,7 @@ def train(dataloader, model, loss_fn, optimizer):
         # Backpropagation
         loss.backward()
         optimizer.step()
-       
+        optimizer.zero_grad()
 
         if batch % 100 == 0:
             loss, current = loss.item(), batch * batch_size + len(X)
@@ -72,7 +72,7 @@ def test_loop(dataloader, model, loss_fn):
     test_loss /= num_batches
     correct /= size
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-   
+    return correct  # Return accuracy for model saving logic
 
 # Function to predict the class of a single image
 def predict_image(model, image_path, device="cpu"):
