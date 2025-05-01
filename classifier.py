@@ -30,7 +30,7 @@ class NeuralNetwork(nn.Module):
         return logits
 
 # Define training function used to train model
-def train(dataloader, model, loss_fn, optimizer):
+def train_loop(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
     batch_size = dataloader.batch_size
     # Set the model to training mode - important for batch normalization and dropout layers
@@ -128,7 +128,7 @@ def main():
     optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
     
     # Training loop
-    epochs = 50
+    epochs = 100
     best_accuracy = 0
     
     for t in range(epochs):
