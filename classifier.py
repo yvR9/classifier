@@ -108,8 +108,9 @@ def main():
     # Load Fashion MNIST dataset
     DATA_DIR = "."
     transform = transforms.Compose([
-        transforms.ToTensor()
-    ])
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,), (0.5,))
+])
     
     train_dataset = datasets.FashionMNIST(DATA_DIR, train=True, transform=transform, download=True)
     test_dataset = datasets.FashionMNIST(DATA_DIR, train=False, transform=transform, download=True)
